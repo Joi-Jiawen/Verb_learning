@@ -30,6 +30,8 @@
             position: relative;
             overflow: hidden;
             border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+            background-color: #f0f8ff;
         }
         
         /* Scenes */
@@ -292,6 +294,20 @@
             font-size: 11px;
             color: #2C3E50;
             margin-bottom: 4px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .skip-button {
+            color: #3498DB;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        
+        .skip-button:hover {
+            color: #2E86C1;
+            text-decoration: underline;
         }
         
         .progress-track {
@@ -353,6 +369,25 @@
             font-size: 24px;
             z-index: 4;
             transition: transform 0.5s;
+            animation: mouseMovement 3s infinite alternate ease-in-out;
+        }
+        
+        @keyframes mouseMovement {
+            0% { transform: translate(0, 0); }
+            25% { transform: translate(-30px, 10px); }
+            50% { transform: translate(-10px, -10px); }
+            75% { transform: translate(-20px, 5px); }
+            100% { transform: translate(-40px, -5px); }
+        }
+        
+        .mouse-character.correct-answer {
+            animation: none;
+            transform: translateX(200px);
+        }
+        
+        .mouse-character.wrong-answer {
+            animation: none;
+            transform: translateX(200px) translateY(-50px);
         }
         
         .stolen-item {
@@ -363,12 +398,45 @@
             z-index: 3;
         }
         
-        .mouse-character.correct-answer {
-            transform: translateX(200px);
+        .stolen-item.dropped {
+            animation: itemDrop 1s forwards;
         }
         
-        .mouse-character.wrong-answer {
-            transform: translateY(200px);
+        @keyframes itemDrop {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(10px, 100px); }
+        }
+        
+        .timer-container {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            z-index: 10;
+        }
+        
+        .timer-text {
+            font-size: 12px;
+            font-weight: bold;
+            color: #E74C3C;
+            text-align: center;
+            margin-bottom: 2px;
+        }
+        
+        .timer-bar {
+            width: 100%;
+            height: 6px;
+            background-color: #ECF0F1;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        
+        .timer-value {
+            height: 100%;
+            background-color: #E74C3C;
+            border-radius: 3px;
+            transition: width 0.1s linear;
         }
         
         .question-box {
@@ -595,7 +663,10 @@
             <div class="sandwich-area" id="sandwich-area"></div>
             
             <div class="progress-bar">
-                <div class="progress-text">Progress: <span id="step-progress">0/6</span></div>
+                <div class="progress-text">
+                    <span>Progress: <span id="step-progress">0/6</span></span>
+                    <span class="skip-button" id="skip-button">Skip ≫</span>
+                </div>
                 <div class="progress-track">
                     <div id="learn-progress-value" class="progress-value" style="width: 0%;"></div>
                 </div>
@@ -630,6 +701,13 @@
                 </div>
             </div>
             
+            <div class="timer-container">
+                <div class="timer-text">Time left: <span id="timer-seconds">10</span>s</div>
+                <div class="timer-bar">
+                    <div id="timer-value" class="timer-value" style="width: 100%;"></div>
+                </div>
+            </div>
+            
             <div class="test-area"></div>
             <div class="test-floor"></div>
             <div class="wall-hole"></div>
@@ -650,7 +728,9 @@
             <div class="pet-character">🐕</div>
             
             <div class="progress-bar">
-                <div class="progress-text">Question: <span id="question-progress">1/3</span></div>
+                <div class="progress-text">
+                    <span>Question: <span id="question-progress">1/3</span></span>
+                </div>
                 <div class="progress-track">
                     <div id="check-progress-value" class="progress-value" style="width: 33%;"></div>
                 </div>
@@ -697,7 +777,9 @@
             learnStep: 0,
             currentQuestion: 0,
             score: 0,
-            dayComplete: false
+            dayComplete: false,
+            timer: null,
+            timeLeft: 10
         };
         
         // Food items data
@@ -793,9 +875,15 @@
         const popupEmoji = document.getElementById('popup-emoji');
         const popupText = document.getElementById('popup-text');
         
+        const timerSecondsElement = document.getElementById('timer-seconds');
+        const timerValueElement = document.getElementById('timer-value');
+        
+        const skipButton = document.getElementById('skip-button');
+        
         // Event listeners
         document.getElementById('start-button').addEventListener('click', startGame);
         document.getElementById('next-day-button').addEventListener('click', startNewDay);
+        skipButton.addEventListener('click', skipToCheckPhase);
         
         // Add click handlers to food items
         foodItems.forEach(item => {
@@ -816,6 +904,9 @@
         
         function changeScene(newScene) {
             gameState.phase = newScene;
+            
+            // Clear any existing timer
+            clearInterval(gameState.timer);
             
             // Hide all scenes
             startScene.classList.remove('active');
@@ -866,90 +957,8 @@
             const targetItem = learningSteps[step].targetItem;
             if (targetItem) {
                 const element = document.getElementById(`${targetItem}-item`);
-                element.classList.add('target-item');
-            }
-            
-            // If this is the last step, move to check phase after a delay
-            if (step === learningSteps.length - 1) {
-                setTimeout(() => {
-                    changeScene('check');
-                }, 2000);
-            }
-        }
-        
-        function handleFoodItemClick(item) {
-            if (gameState.phase !== 'learn') return;
-            
-            const currentStep = learningSteps[gameState.learnStep];
-            
-            // If there's no target item in this step, do nothing
-            if (!currentStep.targetItem) return;
-            
-            if (item.id === currentStep.targetItem) {
-                // Correct item selected
-                showPopup(item, true);
-                
-                // Add to sandwich
-                addToSandwich(item);
-                
-                // Increase happiness
-                gameState.happiness = Math.min(gameState.happiness + 8, 100);
-                updateStatusBars();
-                
-                // Move to next step after a delay
-                setTimeout(() => {
-                    updateLearnStep(gameState.learnStep + 1);
-                }, 1500);
-            } else {
-                // Wrong item selected
-                showPopup({ emoji: '❌', name: "That's not what we're looking for. Try again!" }, false);
-            }
-        }
-        
-        function addToSandwich(item) {
-            const sandwichItem = document.createElement('div');
-            sandwichItem.className = 'sandwich-item';
-            sandwichItem.textContent = item.emoji;
-            sandwichArea.appendChild(sandwichItem);
-        }
-        
-        function showPopup(item, isSuccess) {
-            popupEmoji.textContent = item.emoji;
-            popupText.textContent = item.name;
-            
-            // Add border color based on success/failure
-            feedbackPopup.style.borderLeft = isSuccess ? '4px solid #2ECC71' : '4px solid #E74C3C';
-            
-            // Show popup
-            feedbackPopup.classList.add('visible');
-            
-            // Hide after a delay
-            setTimeout(() => {
-                feedbackPopup.classList.remove('visible');
-            }, 2000);
-        }
-        
-        function setupCheckPhase() {
-            gameState.currentQuestion = 0;
-            gameState.score = 0;
-            
-            // Set up first question
-            setupQuestion(0);
-        }
-        
-        function setupQuestion(questionIndex) {
-            if (questionIndex >= questions.length) {
-                // Quiz complete
-                finishQuiz();
-                return;
-            }
-            
-            const question = questions[questionIndex];
-            
-            // Update stolen item
-            stolenItem.textContent = foodItems.find(item => item.id === question.item).emoji;
-            
-                        // Reset mouse position and animation
+
+            // Reset mouse position and animation
             mouseCharacter.className = 'mouse-character';
             
             // Update question text
