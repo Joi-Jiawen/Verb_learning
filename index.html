@@ -1,0 +1,502 @@
+import { useState, useEffect } from 'react';
+
+const GuaguaGame = () => {
+  // Game state
+  const [gamePhase, setGamePhase] = useState('start'); // start, learn, check, complete
+  const [energy, setEnergy] = useState(70);
+  const [happiness, setHappiness] = useState(80);
+  const [message, setMessage] = useState("Welcome to Guagua's English Adventure!");
+  const [dayComplete, setDayComplete] = useState(false);
+  
+  // Learn phase states
+  const [currentStep, setCurrentStep] = useState(0);
+  const [showTarget, setShowTarget] = useState(false);
+  const [itemFound, setItemFound] = useState(false);
+  const [showPopup, setShowPopup] = useState(false);
+  const [activeItem, setActiveItem] = useState(null);
+  
+  // Check phase states
+  const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [selectedAnswer, setSelectedAnswer] = useState(null);
+  const [showResult, setShowResult] = useState(false);
+  const [quizComplete, setQuizComplete] = useState(false);
+  const [animation, setAnimation] = useState(null);
+  const [score, setScore] = useState(0);
+  
+  // Food items data with consistent styling
+  const items = [
+    { id: 'bread', name: 'Bread', emoji: '🍞', position: 'left-12 top-24', bgColor: 'bg-amber-100' },
+    { id: 'tomato', name: 'Tomato', emoji: '🍅', position: 'left-40 top-24', bgColor: 'bg-red-100' },
+    { id: 'cucumber', name: 'Cucumber', emoji: '🥒', position: 'left-68 top-24', bgColor: 'bg-green-100' },
+    { id: 'cheese', name: 'Cheese', emoji: '🧀', position: 'left-12 top-48', bgColor: 'bg-yellow-100' },
+    { id: 'lettuce', name: 'Lettuce', emoji: '🥬', position: 'left-40 top-48', bgColor: 'bg-green-200' }
+  ];
+  
+  // Learning steps data
+  const learningSteps = [
+    { 
+      instruction: "Let's make a sandwich for Guagua!",
+      targetItem: null,
+      action: () => setTimeout(() => {
+        setCurrentStep(1);
+        setShowTarget(true);
+      }, 2000)
+    },
+    { 
+      instruction: "First, let's find bread",
+      targetItem: 'bread',
+      action: null
+    },
+    { 
+      instruction: "Next, let's find cucumber",
+      targetItem: 'cucumber',
+      action: null
+    },
+    { 
+      instruction: "Now, let's add some cheese",
+      targetItem: 'cheese',
+      action: null
+    },
+    { 
+      instruction: "Let's add a tomato",
+      targetItem: 'tomato',
+      action: null
+    },
+    { 
+      instruction: "Finally, let's add some lettuce",
+      targetItem: 'lettuce',
+      action: null
+    },
+    { 
+      instruction: "Excellent! We made a sandwich for Guagua!",
+      targetItem: null,
+      action: () => setTimeout(() => {
+        setGamePhase('check');
+        setMessage("The mouse is stealing! Answer the question to catch them.");
+      }, 1500)
+    }
+  ];
+  
+  // Quiz questions data
+  const questions = [
+    {
+      item: 'bread',
+      emoji: '🍞',
+      question: "What's this?",
+      options: ['Apple', 'Bread', 'Orange'],
+      correct: 'Bread'
+    },
+    {
+      item: 'tomato',
+      emoji: '🍅',
+      question: "What's this?",
+      options: ['Tomato', 'Apple', 'Carrot'],
+      correct: 'Tomato'
+    },
+    {
+      item: 'cucumber',
+      emoji: '🥒',
+      question: "What's this?",
+      options: ['Carrot', 'Celery', 'Cucumber'],
+      correct: 'Cucumber'
+    }
+  ];
+  
+  // Reset game state when changing phases
+  useEffect(() => {
+    if (gamePhase === 'learn') {
+      setCurrentStep(0);
+      setMessage(learningSteps[0].instruction);
+      if (learningSteps[0].action) {
+        learningSteps[0].action();
+      }
+    } else if (gamePhase === 'check') {
+      setCurrentQuestion(0);
+      setQuizComplete(false);
+      setScore(0);
+      setMessage(`The mouse is stealing ${questions[0].item}! What's this?`);
+    }
+  }, [gamePhase]);
+  
+  // Handle learning phase item clicks
+  const handleLearnItemClick = (item) => {
+    const currentTarget = learningSteps[currentStep].targetItem;
+    
+    if (currentTarget && item.id === currentTarget && !itemFound) {
+      // Correct item was clicked
+      setItemFound(true);
+      setHappiness(prev => Math.min(prev + 8, 100));
+      
+      // Show success popup
+      setShowPopup(true);
+      setActiveItem(item);
+      
+      // Move to next step after delay
+      setTimeout(() => {
+        setShowPopup(false);
+        setCurrentStep(prev => prev + 1);
+        setItemFound(false);
+      }, 1500);
+    } else if (currentTarget && item.id !== currentTarget) {
+      // Wrong item was clicked
+      setShowPopup(true);
+      setMessage("That's not what we're looking for. Try again!");
+      
+      setTimeout(() => {
+        setShowPopup(false);
+        setMessage(learningSteps[currentStep].instruction);
+      }, 1500);
+    }
+  };
+  
+  // Update current step message
+  useEffect(() => {
+    if (gamePhase === 'learn' && currentStep < learningSteps.length) {
+      setMessage(learningSteps[currentStep].instruction);
+      
+      if (learningSteps[currentStep].action) {
+        learningSteps[currentStep].action();
+      }
+    }
+  }, [currentStep, gamePhase]);
+  
+  // Handle quiz answer selection
+  const handleAnswerSelect = (answer) => {
+    if (selectedAnswer !== null) return; // Prevent multiple selections
+    
+    setSelectedAnswer(answer);
+    
+    const isCorrect = answer === questions[currentQuestion].correct;
+    
+    if (isCorrect) {
+      setScore(prev => prev + 1);
+      setEnergy(prev => Math.min(prev + 10, 100));
+      setHappiness(prev => Math.min(prev + 10, 100));
+      setAnimation('correct');
+      setMessage("Correct! The mouse dropped the food!");
+    } else {
+      setEnergy(prev => Math.max(prev - 5, 0));
+      setHappiness(prev => Math.max(prev - 5, 0));
+      setAnimation('incorrect');
+      setMessage(`Wrong! That's a ${questions[currentQuestion].item}.`);
+    }
+    
+    setShowResult(true);
+    
+    // Move to next question after delay
+    setTimeout(() => {
+      setSelectedAnswer(null);
+      setShowResult(false);
+      setAnimation(null);
+      
+      if (currentQuestion < questions.length - 1) {
+        setCurrentQuestion(prev => prev + 1);
+        setMessage(`The mouse is stealing ${questions[currentQuestion + 1].item}! What's this?`);
+      } else {
+        setQuizComplete(true);
+        setMessage(`Quiz complete! You scored ${score + (isCorrect ? 1 : 0)}/${questions.length}`);
+        
+        setTimeout(() => {
+          setGamePhase('complete');
+          setMessage(`Look, now Guagua is full of energy!`);
+          
+          setTimeout(() => {
+            setMessage("See you tomorrow.");
+            setDayComplete(true);
+          }, 3000);
+        }, 2000);
+      }
+    }, 2000);
+  };
+  
+  // Get style for quiz options
+  const getOptionStyle = (option) => {
+    if (selectedAnswer === null) {
+      return "bg-white hover:bg-blue-50 text-gray-800";
+    }
+    
+    if (option === questions[currentQuestion].correct) {
+      return "bg-green-500 text-white";
+    }
+    
+    if (option === selectedAnswer && selectedAnswer !== questions[currentQuestion].correct) {
+      return "bg-red-500 text-white";
+    }
+    
+    return "bg-gray-100 text-gray-400";
+  };
+  
+  // Start game
+  const startGame = () => {
+    setGamePhase('learn');
+    setMessage("Let's make a sandwich for Guagua!");
+  };
+  
+  // Restart game for a new day
+  const startNewDay = () => {
+    setGamePhase('learn');
+    setDayComplete(false);
+    setEnergy(70);
+    setHappiness(80);
+    setMessage(`Let's make another sandwich for Guagua!`);
+  };
+  
+  // Render sandwich being built
+  const renderSandwich = () => {
+    if (gamePhase !== 'learn' || currentStep < 1) return null;
+    
+    return (
+      <div className="absolute right-20 bottom-20 w-16 flex flex-col-reverse items-center">
+        {currentStep > 5 && <div className="text-xl z-50">🥬</div>}
+        {currentStep > 4 && <div className="text-xl z-40">🍅</div>}
+        {currentStep > 3 && <div className="text-xl z-30">🧀</div>}
+        {currentStep > 2 && <div className="text-xl z-20">🥒</div>}
+        {currentStep > 1 && <div className="text-xl z-10">🍞</div>}
+      </div>
+    );
+  };
+  
+  // Render items in kitchen
+  const renderItems = () => {
+    if (gamePhase !== 'learn') return null;
+    
+    return items.map(item => {
+      const isTarget = learningSteps[currentStep]?.targetItem === item.id;
+      
+      return (
+        <div 
+          key={item.id}
+          className={`absolute ${item.position} ${item.bgColor} p-3 rounded-lg cursor-pointer shadow-md ${isTarget && showTarget ? 'ring-2 ring-blue-400 animate-pulse' : ''}`}
+          onClick={() => handleLearnItemClick(item)}
+        >
+          <div className="text-3xl">{item.emoji}</div>
+        </div>
+      );
+    });
+  };
+  
+  return (
+    <div className="flex justify-center items-center h-full w-full">
+      <div className="w-full max-w-md">
+        {/* Square Game Frame */}
+        <div className="w-full" style={{ aspectRatio: '1/1' }}>
+          <div className="w-full h-full relative bg-gray-50 overflow-hidden">
+            {/* Start Screen */}
+            {gamePhase === 'start' && (
+              <div className="absolute inset-0 bg-blue-50 flex flex-col items-center justify-center p-6">
+                <h1 className="text-2xl font-bold text-center mb-6 text-blue-700">Guagua's English Adventure</h1>
+                <div className="text-8xl mb-8">🐶</div>
+                <p className="mb-6 px-4 text-center text-gray-700">Help Guagua learn English words!</p>
+                <button 
+                  className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-lg font-bold shadow-lg transition-colors"
+                  onClick={startGame}
+                >
+                  Start Game
+                </button>
+              </div>
+            )}
+            
+            {/* Main Game */}
+            {(gamePhase === 'learn' || gamePhase === 'check' || gamePhase === 'complete') && (
+              <>
+                {/* Title */}
+                <div className="absolute top-2 left-0 right-0 text-center z-20">
+                  <h1 className="text-xl font-bold text-blue-700">Guagua's English Adventure</h1>
+                </div>
+                
+                {/* Status Meters */}
+                <div className="absolute top-10 right-4 z-10">
+                  <div className="flex items-center">
+                    <div className="text-xs font-bold text-blue-700 mr-2">Energy</div>
+                    <div className="w-24 h-4 bg-gray-200 rounded-full overflow-hidden">
+                      <div className="h-full bg-green-500 rounded-full" style={{width: `${energy}%`}}></div>
+                    </div>
+                  </div>
+                  <div className="flex items-center mt-1">
+                    <div className="text-xs font-bold text-blue-700 mr-2">Happiness</div>
+                    <div className="w-24 h-4 bg-gray-200 rounded-full overflow-hidden">
+                      <div className="h-full bg-yellow-400 rounded-full" style={{width: `${happiness}%`}}></div>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Kitchen Scene - For Learn phase */}
+                {gamePhase === 'learn' && (
+                  <div className="absolute inset-0 bg-blue-50">
+                    {/* Kitchen Background Elements - Clean and minimal */}
+                    <div className="absolute left-0 right-0 top-0 h-16 bg-white"></div>
+                    <div className="absolute left-0 right-0 bottom-0 h-32 bg-gray-100"></div>
+                    
+                    {/* Chef Character */}
+                    <div className="absolute left-6 bottom-40">
+                      <div className="relative">
+                        <div className="text-4xl">👨‍🍳</div>
+                      </div>
+                    </div>
+                    
+                    {/* Interactive Food Items */}
+                    {renderItems()}
+                    
+                    {/* Sandwich Building Area */}
+                    {renderSandwich()}
+                    
+                    {/* Guagua */}
+                    <div className="absolute right-8 bottom-8">
+                      <div className="text-4xl">🐶</div>
+                    </div>
+                    
+                    {/* Progress Indicator for Learn Phase */}
+                    <div className="absolute bottom-16 left-4 right-4">
+                      <div className="flex justify-between text-xs text-gray-600 mb-1">
+                        <span>Progress</span>
+                        <span>{Math.min(currentStep, learningSteps.length - 1)}/{learningSteps.length - 1}</span>
+                      </div>
+                      <div className="w-full h-3 bg-gray-200 rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-blue-500 rounded-full" 
+                          style={{width: `${(Math.min(currentStep, learningSteps.length - 1) / (learningSteps.length - 1)) * 100}%`}}
+                        ></div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
+                {/* Check/Quiz Phase */}
+                {gamePhase === 'check' && (
+                  <div className="absolute inset-0 bg-gray-100">
+                    {/* Scene Background - Clean and minimal */}
+                    <div className="absolute inset-x-0 top-0 h-2/3 bg-blue-50"></div>
+                    <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gray-200"></div>
+                    
+                    {/* Hole in wall - Simple design */}
+                    <div className="absolute right-16 top-24 w-16 h-24 bg-gray-700 rounded-t-full"></div>
+                    
+                    {!quizComplete && (
+                      <>
+                        {/* Mouse with item - Aligned clearly */}
+                        <div className={`absolute transform transition-all duration-500 ${animation === 'correct' ? 'translate-x-96' : animation === 'incorrect' ? 'translate-y-96' : 'right-20 top-32'}`}>
+                          <div className="relative">
+                            <div className="text-3xl">🐭</div>
+                            <div className="absolute -top-8 -right-2 text-3xl">
+                              {currentQuestion < questions.length ? questions[currentQuestion].emoji : ''}
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {/* Question display - Clean design */}
+                        <div className="absolute top-1/4 left-6 bg-white rounded-lg p-3 shadow-md">
+                          <p className="font-bold text-gray-800">{currentQuestion < questions.length ? questions[currentQuestion].question : ''}</p>
+                        </div>
+                        
+                        {/* Guagua */}
+                        <div className="absolute left-8 bottom-8">
+                          <div className="text-4xl">🐶</div>
+                        </div>
+                        
+                        {/* Answer Options - Aligned grid */}
+                        <div className="absolute bottom-24 left-4 right-4 grid grid-cols-3 gap-3">
+                          {currentQuestion < questions.length && questions[currentQuestion].options.map((option, index) => (
+                            <button 
+                              key={index}
+                              className={`py-3 px-2 rounded-lg border border-gray-300 font-semibold text-sm transition-colors ${getOptionStyle(option)}`}
+                              onClick={() => handleAnswerSelect(option)}
+                              disabled={selectedAnswer !== null}
+                            >
+                              {option}
+                            </button>
+                          ))}
+                        </div>
+                        
+                        {/* Progress Indicator */}
+                        <div className="absolute bottom-16 left-4 right-4">
+                          <div className="flex justify-between text-xs text-gray-600 mb-1">
+                            <span>Question</span>
+                            <span>{Math.min(currentQuestion + 1, questions.length)}/{questions.length}</span>
+                          </div>
+                          <div className="w-full h-3 bg-gray-200 rounded-full overflow-hidden">
+                            <div 
+                              className="h-full bg-blue-500 rounded-full" 
+                              style={{width: `${(Math.min(currentQuestion + 1, questions.length) / questions.length) * 100}%`}}
+                            ></div>
+                          </div>
+                        </div>
+                      </>
+                    )}
+                    
+                    {quizComplete && (
+                      <div className="absolute top-1/3 left-1/2 transform -translate-x-1/2 bg-white rounded-lg p-6 shadow-lg text-center w-64">
+                        <div className="text-3xl mb-3">🎉</div>
+                        <h2 className="text-xl font-bold text-blue-700">Quiz Complete!</h2>
+                        <p className="mt-3 text-gray-700">You scored: {score}/{questions.length}</p>
+                        <div className="mt-4">
+                          <div className="text-5xl mb-2">
+                            {score === questions.length ? '🌟' : score >= questions.length / 2 ? '😊' : '😐'}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+                
+                {/* Complete Phase */}
+                {gamePhase === 'complete' && (
+                  <div className="absolute inset-0 bg-blue-50 flex flex-col items-center justify-center">
+                    <h2 className="text-2xl font-bold text-blue-700 mb-8">Great Job!</h2>
+                    <div className="text-7xl mb-4">🐶</div>
+                    {!dayComplete && <div className="text-4xl">🥪</div>}
+                    <p className="text-gray-700 mt-6">{message}</p>
+                    
+                    {dayComplete && (
+                      <button 
+                        className="mt-8 bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg font-bold shadow-md transition-colors"
+                        onClick={startNewDay}
+                      >
+                        Play Next Day
+                      </button>
+                    )}
+                  </div>
+                )}
+                
+                {/* Common elements for all game phases */}
+                
+                {/* Popup for feedback/word display */}
+                {showPopup && activeItem && (
+                  <div className="absolute top-1/3 left-1/2 transform -translate-x-1/2 bg-white rounded-lg p-4 shadow-lg flex items-center space-x-4 z-20 border-2 border-blue-300">
+                    <div className="text-4xl">{activeItem.emoji}</div>
+                    <div>
+                      <div className="text-lg font-bold text-gray-800">{activeItem.name}</div>
+                      <div className="text-xs text-gray-500">Click to hear again</div>
+                    </div>
+                    <div className="ml-1 text-lg">🔊</div>
+                  </div>
+                )}
+                
+                {/* Bottom UI - Simple and clean */}
+                <div className="absolute bottom-4 left-4 flex space-x-2 items-center">
+                  <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs">
+                    <span className="text-xs">Lv.1</span>
+                  </div>
+                </div>
+                
+                {/* Message Box - Clean design */}
+                <div className="absolute left-0 right-0 bottom-0 bg-blue-600 text-white p-3">
+                  <div className="relative pl-10">
+                    {/* Character icon */}
+                    <div className="absolute -top-6 left-3 w-8 h-8 bg-white rounded-full overflow-hidden flex items-center justify-center">
+                      <div className="text-lg">
+                        {gamePhase === 'learn' ? '👨‍🍳' : '🐶'}
+                      </div>
+                    </div>
+                    <p className="text-sm">{message}</p>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default GuaguaGame;
