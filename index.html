@@ -96,6 +96,26 @@
             z-index: 10;
         }
         
+        .skip-button {
+            position: absolute;
+            bottom: 60px;
+            right: 15px;
+            background-color: #3498DB;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 6px 15px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 10;
+            transition: background-color 0.2s;
+        }
+        
+        .skip-button:hover {
+            background-color: #2980B9;
+        }
+        
         .scene-header h1 {
             font-size: 20px;
             color: #2C3E50;
@@ -294,20 +314,6 @@
             font-size: 11px;
             color: #2C3E50;
             margin-bottom: 4px;
-            display: flex;
-            justify-content: space-between;
-        }
-        
-        .skip-button {
-            color: #3498DB;
-            font-weight: bold;
-            cursor: pointer;
-            transition: color 0.2s;
-        }
-        
-        .skip-button:hover {
-            color: #2E86C1;
-            text-decoration: underline;
         }
         
         .progress-track {
@@ -369,25 +375,15 @@
             font-size: 24px;
             z-index: 4;
             transition: transform 0.5s;
-            animation: mouseMovement 3s infinite alternate ease-in-out;
+            animation: mouseMovement 3s infinite alternate;
         }
         
         @keyframes mouseMovement {
-            0% { transform: translate(0, 0); }
-            25% { transform: translate(-30px, 10px); }
-            50% { transform: translate(-10px, -10px); }
-            75% { transform: translate(-20px, 5px); }
-            100% { transform: translate(-40px, -5px); }
-        }
-        
-        .mouse-character.correct-answer {
-            animation: none;
-            transform: translateX(200px);
-        }
-        
-        .mouse-character.wrong-answer {
-            animation: none;
-            transform: translateX(200px) translateY(-50px);
+            0% { transform: translateY(-10px); }
+            25% { transform: translateX(-10px) translateY(-5px); }
+            50% { transform: translateY(10px); }
+            75% { transform: translateX(10px) translateY(5px); }
+            100% { transform: translateY(-10px); }
         }
         
         .stolen-item {
@@ -398,45 +394,38 @@
             z-index: 3;
         }
         
-        .stolen-item.dropped {
-            animation: itemDrop 1s forwards;
+        .mouse-character.correct-answer {
+            animation: none;
+            transform: translateX(200px);
         }
         
-        @keyframes itemDrop {
-            0% { transform: translate(0, 0); }
-            100% { transform: translate(10px, 100px); }
+        .mouse-character.wrong-answer {
+            animation: none;
+            transform: translateY(200px);
         }
         
-        .timer-container {
+        .mouse-character.timer-running {
+            animation: timerMovement 5s linear forwards;
+        }
+        
+        @keyframes timerMovement {
+            0% { right: 50px; top: 100px; }
+            20% { right: 70px; top: 80px; }
+            40% { right: 40px; top: 110px; }
+            60% { right: 60px; top: 90px; }
+            80% { right: 30px; top: 100px; }
+            100% { right: -50px; top: 100px; }
+        }
+        
+        .falling-food {
             position: absolute;
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 120px;
-            z-index: 10;
+            animation: foodFalling 1s forwards;
+            z-index: 3;
         }
         
-        .timer-text {
-            font-size: 12px;
-            font-weight: bold;
-            color: #E74C3C;
-            text-align: center;
-            margin-bottom: 2px;
-        }
-        
-        .timer-bar {
-            width: 100%;
-            height: 6px;
-            background-color: #ECF0F1;
-            border-radius: 3px;
-            overflow: hidden;
-        }
-        
-        .timer-value {
-            height: 100%;
-            background-color: #E74C3C;
-            border-radius: 3px;
-            transition: width 0.1s linear;
+        @keyframes foodFalling {
+            0% { top: -30px; right: -8px; }
+            100% { top: 100px; right: -8px; }
         }
         
         .question-box {
@@ -663,14 +652,13 @@
             <div class="sandwich-area" id="sandwich-area"></div>
             
             <div class="progress-bar">
-                <div class="progress-text">
-                    <span>Progress: <span id="step-progress">0/6</span></span>
-                    <span class="skip-button" id="skip-button">Skip ≫</span>
-                </div>
+                <div class="progress-text">Progress: <span id="step-progress">0/6</span></div>
                 <div class="progress-track">
                     <div id="learn-progress-value" class="progress-value" style="width: 0%;"></div>
                 </div>
             </div>
+            
+            <button id="skip-button" class="skip-button">Skip to Test</button>
             
             <div class="message-box">
                 <div class="speaker-icon">👨‍🍳</div>
@@ -701,13 +689,6 @@
                 </div>
             </div>
             
-            <div class="timer-container">
-                <div class="timer-text">Time left: <span id="timer-seconds">10</span>s</div>
-                <div class="timer-bar">
-                    <div id="timer-value" class="timer-value" style="width: 100%;"></div>
-                </div>
-            </div>
-            
             <div class="test-area"></div>
             <div class="test-floor"></div>
             <div class="wall-hole"></div>
@@ -728,9 +709,7 @@
             <div class="pet-character">🐕</div>
             
             <div class="progress-bar">
-                <div class="progress-text">
-                    <span>Question: <span id="question-progress">1/3</span></span>
-                </div>
+                <div class="progress-text">Question: <span id="question-progress">1/3</span></div>
                 <div class="progress-track">
                     <div id="check-progress-value" class="progress-value" style="width: 33%;"></div>
                 </div>
@@ -777,9 +756,7 @@
             learnStep: 0,
             currentQuestion: 0,
             score: 0,
-            dayComplete: false,
-            timer: null,
-            timeLeft: 10
+            dayComplete: false
         };
         
         // Food items data
@@ -875,15 +852,10 @@
         const popupEmoji = document.getElementById('popup-emoji');
         const popupText = document.getElementById('popup-text');
         
-        const timerSecondsElement = document.getElementById('timer-seconds');
-        const timerValueElement = document.getElementById('timer-value');
-        
-        const skipButton = document.getElementById('skip-button');
-        
         // Event listeners
         document.getElementById('start-button').addEventListener('click', startGame);
         document.getElementById('next-day-button').addEventListener('click', startNewDay);
-        skipButton.addEventListener('click', skipToCheckPhase);
+        document.getElementById('skip-button').addEventListener('click', skipToTestPhase);
         
         // Add click handlers to food items
         foodItems.forEach(item => {
@@ -904,9 +876,6 @@
         
         function changeScene(newScene) {
             gameState.phase = newScene;
-            
-            // Clear any existing timer
-            clearInterval(gameState.timer);
             
             // Hide all scenes
             startScene.classList.remove('active');
@@ -938,218 +907,116 @@
         }
         
         function updateLearnStep(step) {
-    // Reset target highlighting
-    foodItems.forEach(item => {
-        const element = document.getElementById(`${item.id}-item`);
-        element.classList.remove('target-item');
-    });
-    
-    gameState.learnStep = step;
-    learnMessage.textContent = learningSteps[step].instruction;
-    
-    // Update progress
-    const totalSteps = learningSteps.length - 1; // Subtract first instruction
-    const currentProgress = Math.min(step, totalSteps);
-    stepProgress.textContent = `${currentProgress}/${totalSteps}`;
-    learnProgressValue.style.width = `${(currentProgress / totalSteps) * 100}%`;
-    
-    // Highlight target item if there is one
-    const targetItem = learningSteps[step].targetItem;
-    if (targetItem) {
-        const element = document.getElementById(`${targetItem}-item`);
-        element.classList.add('target-item');
-    }
-    
-    // If this is the last step, move to check phase after a delay
-    if (step === learningSteps.length - 1) {
-        setTimeout(() => {
-            changeScene('check');
-        }, 2000);
-    }
-}
-
-        function setupQuestion(questionIndex) {
-    if (questionIndex >= questions.length) {
-        // Quiz complete
-        finishQuiz();
-        return;
-    }
-    
-    const question = questions[questionIndex];
-    
-    // Reset mouse and stolen item
-    mouseCharacter.className = 'mouse-character';
-    stolenItem.className = 'stolen-item';
-    
-    // Update stolen item
-    stolenItem.textContent = foodItems.find(item => item.id === question.item).emoji;
-    
-    // Update question text
-    questionText.textContent = question.question;
-    
-    // Update progress
-    questionProgress.textContent = `${questionIndex + 1}/${questions.length}`;
-    checkProgressValue.style.width = `${((questionIndex + 1) / questions.length) * 100}%`;
-    
-    // Set check message
-    checkMessage.textContent = `The mouse is stealing ${foodItems.find(item => item.id === question.item).name}! What's this?`;
-    
-    // Clear answer options
-    answerOptions.innerHTML = '';
-    
-    // Add answer options
-    question.options.forEach(option => {
-        const optionElement = document.createElement('div');
-        optionElement.className = 'answer-option';
-        optionElement.textContent = option;
-        optionElement.addEventListener('click', () => handleAnswerSelect(option));
-        answerOptions.appendChild(optionElement);
-    });
-    
-    // Start timer
-    startTimer();
-}
-
-        function handleFoodItemClick(item) {
-    if (gameState.phase !== 'learn') return;
-    
-    const currentStep = learningSteps[gameState.learnStep];
-    
-    // If there's no target item in this step, do nothing
-    if (!currentStep.targetItem) return;
-    
-    if (item.id === currentStep.targetItem) {
-        // Correct item selected
-        showPopup(item, true);
-        
-        // Add to sandwich
-        addToSandwich(item);
-        
-        // Increase happiness
-        gameState.happiness = Math.min(gameState.happiness + 8, 100);
-        updateStatusBars();
-        
-        // Move to next step after a delay
-        setTimeout(() => {
-            updateLearnStep(gameState.learnStep + 1);
-        }, 1500);
-    } else {
-        // Wrong item selected
-        showPopup({ emoji: '❌', name: "That's not what we're looking for. Try again!" }, false);
-    }
-}
-
-        function skipToCheckPhase() {
-    // If we're already on the last step, do nothing
-    if (gameState.learnStep >= learningSteps.length - 1) return;
-    
-    // Add all the remaining sandwich items at once
-    const remainingSteps = learningSteps.slice(Math.max(1, gameState.learnStep));
-    
-    remainingSteps.forEach(step => {
-        if (step.targetItem) {
-            const item = foodItems.find(item => item.id === step.targetItem);
-            if (item) {
-                addToSandwich(item);
-            }
-        }
-    });
-    
-    // Move directly to the check phase
-    changeScene('check');
-}
-
-function startTimer() {
-    // Reset timer
-    gameState.timeLeft = 10;
-    timerSecondsElement.textContent = gameState.timeLeft;
-    timerValueElement.style.width = '100%';
-    
-    // Clear any existing timer
-    clearInterval(gameState.timer);
-    
-    // Start new timer
-    gameState.timer = setInterval(() => {
-        gameState.timeLeft--;
-        timerSecondsElement.textContent = gameState.timeLeft;
-        timerValueElement.style.width = `${(gameState.timeLeft / 10) * 100}%`;
-        
-        if (gameState.timeLeft <= 0) {
-            // Time's up - mouse escapes with the food
-            clearInterval(gameState.timer);
-            handleTimeUp();
-        }
-    }, 1000);
-}
-
-function handleTimeUp() {
-    // Disable all options
-    const options = document.querySelectorAll('.answer-option');
-    options.forEach(option => {
-        option.classList.add('disabled');
-        
-        // Highlight the correct answer
-        const question = questions[gameState.currentQuestion];
-        if (option.textContent === question.correct) {
-            option.classList.add('correct');
-        }
-    });
-    
-    // Update message
-    checkMessage.textContent = "Oh no! You ran out of time. The mouse got away!";
-    
-    // Mouse escapes with the food
-    mouseCharacter.classList.add('wrong-answer');
-    
-    // Decrease stats
-    gameState.energy = Math.max(gameState.energy - 5, 0);
-    gameState.happiness = Math.max(gameState.happiness - 5, 0);
-    updateStatusBars();
-    
-    // Move to next question after delay
-    setTimeout(() => {
-        gameState.currentQuestion++;
-        setupQuestion(gameState.currentQuestion);
-    }, 2000);
-}
-
-        function showPopup(item, isSuccess) {
-    popupEmoji.textContent = item.emoji;
-    popupText.textContent = item.name;
-    
-    // Add border color based on success/failure
-    feedbackPopup.style.borderLeft = isSuccess ? '4px solid #2ECC71' : '4px solid #E74C3C';
-    
-    // Show popup
-    feedbackPopup.classList.add('visible');
-    
-    // Hide after a delay
-    setTimeout(() => {
-        feedbackPopup.classList.remove('visible');
-    }, 2000);
-}
-
-function addToSandwich(item) {
-    const sandwichItem = document.createElement('div');
-    sandwichItem.className = 'sandwich-item';
-    sandwichItem.textContent = item.emoji;
-    sandwichArea.appendChild(sandwichItem);
-}
+            // Reset target highlighting
+            foodItems.forEach(item => {
+                const element = document.getElementById(`${item.id}-item`);
+                element.classList.remove('target-item');
+            });
+            
+            gameState.learnStep = step;
+            learnMessage.textContent = learningSteps[step].instruction;
+            
+            // Update progress
+            const totalSteps = learningSteps.length - 1; // Subtract first instruction
+            const currentProgress = Math.min(step, totalSteps);
+            stepProgress.textContent = `${currentProgress}/${totalSteps}`;
+            learnProgressValue.style.width = `${(currentProgress / totalSteps) * 100}%`;
             
             // Highlight target item if there is one
-const targetItem = learningSteps[step].targetItem;
-if (targetItem) {
-    const element = document.getElementById(`${targetItem}-item`);
-    element.classList.add('target-item');
-}
-
-// If this is the last step, move to check phase after a delay
-if (step === learningSteps.length - 1) {
-    setTimeout(() => {
-        changeScene('check');
-    }, 2000);
-}
-
+            const targetItem = learningSteps[step].targetItem;
+            if (targetItem) {
+                const element = document.getElementById(`${targetItem}-item`);
+                element.classList.add('target-item');
+            }
+            
+            // If this is the last step, move to check phase after a delay
+            if (step === learningSteps.length - 1) {
+                setTimeout(() => {
+                    changeScene('check');
+                }, 2000);
+            }
+        }
+        
+        function handleFoodItemClick(item) {
+            if (gameState.phase !== 'learn') return;
+            
+            const currentStep = learningSteps[gameState.learnStep];
+            
+            // If there's no target item in this step, do nothing
+            if (!currentStep.targetItem) return;
+            
+            if (item.id === currentStep.targetItem) {
+                // Correct item selected
+                showPopup(item, true);
+                
+               // Add to sandwich
+                addToSandwich(item);
+                
+                // Increase happiness
+                gameState.happiness = Math.min(gameState.happiness + 8, 100);
+                updateStatusBars();
+                
+                // Move to next step after a delay
+                setTimeout(() => {
+                    updateLearnStep(gameState.learnStep + 1);
+                }, 1500);
+            } else {
+                // Wrong item selected
+                showPopup({ emoji: '❌', name: "That's not what we're looking for. Try again!" }, false);
+            }
+        }
+        
+        function addToSandwich(item) {
+            const sandwichItem = document.createElement('div');
+            sandwichItem.className = 'sandwich-item';
+            sandwichItem.textContent = item.emoji;
+            sandwichArea.appendChild(sandwichItem);
+        }
+        
+        function showPopup(item, isSuccess) {
+            popupEmoji.textContent = item.emoji;
+            popupText.textContent = item.name;
+            
+            // Add border color based on success/failure
+            feedbackPopup.style.borderLeft = isSuccess ? '4px solid #2ECC71' : '4px solid #E74C3C';
+            
+            // Show popup
+            feedbackPopup.classList.add('visible');
+            
+            // Hide after a delay
+            setTimeout(() => {
+                feedbackPopup.classList.remove('visible');
+            }, 2000);
+        }
+        
+        function skipToTestPhase() {
+            // Skip to check phase
+            changeScene('check');
+        }
+        
+        let mouseTimer;
+        
+        function setupCheckPhase() {
+            gameState.currentQuestion = 0;
+            gameState.score = 0;
+            
+            // Set up first question
+            setupQuestion(0);
+        }
+        
+        function setupQuestion(questionIndex) {
+            if (questionIndex >= questions.length) {
+                // Quiz complete
+                finishQuiz();
+                return;
+            }
+            
+            const question = questions[questionIndex];
+            
+            // Update stolen item
+            stolenItem.textContent = foodItems.find(item => item.id === question.item).emoji;
+            stolenItem.className = 'stolen-item';
+            
             // Reset mouse position and animation
             mouseCharacter.className = 'mouse-character';
             
@@ -1174,9 +1041,50 @@ if (step === learningSteps.length - 1) {
                 optionElement.addEventListener('click', () => handleAnswerSelect(option));
                 answerOptions.appendChild(optionElement);
             });
+            
+            // Start mouse timer animation
+            mouseCharacter.classList.add('timer-running');
+            
+            // Set timer to auto-fail if no answer is selected
+            clearTimeout(mouseTimer);
+            mouseTimer = setTimeout(() => {
+                if (gameState.currentQuestion === questionIndex) {
+                    // Time's up - mouse escapes with the food
+                    handleTimeUp();
+                }
+            }, 5000); // 5 seconds timer
+        }
+        
+        function handleTimeUp() {
+            // Disable all options
+            const options = document.querySelectorAll('.answer-option');
+            options.forEach(option => {
+                option.classList.add('disabled');
+                option.removeEventListener('click', handleAnswerSelect);
+                
+                if (option.textContent === questions[gameState.currentQuestion].correct) {
+                    option.classList.add('correct');
+                }
+            });
+            
+            // Update message
+            checkMessage.textContent = "Time's up! The mouse got away with the food!";
+            
+            // Reduce happiness
+            gameState.happiness = Math.max(gameState.happiness - 5, 0);
+            updateStatusBars();
+            
+            // Move to next question after delay
+            setTimeout(() => {
+                gameState.currentQuestion++;
+                setupQuestion(gameState.currentQuestion);
+            }, 2000);
         }
         
         function handleAnswerSelect(answer) {
+            // Clear the timer
+            clearTimeout(mouseTimer);
+            
             const question = questions[gameState.currentQuestion];
             const isCorrect = answer === question.correct;
             
@@ -1193,6 +1101,9 @@ if (step === learningSteps.length - 1) {
                 }
             });
             
+            // Remove timer animation
+            mouseCharacter.classList.remove('timer-running');
+            
             if (isCorrect) {
                 // Correct answer
                 gameState.score++;
@@ -1202,8 +1113,13 @@ if (step === learningSteps.length - 1) {
                 // Update message
                 checkMessage.textContent = "Correct! The mouse dropped the food!";
                 
+                // Make food fall down
+                stolenItem.className = 'stolen-item falling-food';
+                
                 // Animate mouse escaping
-                mouseCharacter.classList.add('correct-answer');
+                setTimeout(() => {
+                    mouseCharacter.classList.add('correct-answer');
+                }, 300);
             } else {
                 // Wrong answer
                 gameState.energy = Math.max(gameState.energy - 5, 0);
@@ -1212,7 +1128,7 @@ if (step === learningSteps.length - 1) {
                 // Update message
                 checkMessage.textContent = `Wrong! That's a ${foodItems.find(item => item.id === question.item).name}.`;
                 
-                // Animate mouse escaping
+                // Animate mouse escaping with food
                 mouseCharacter.classList.add('wrong-answer');
             }
             
