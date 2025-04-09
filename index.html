@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Guagua's English Adventure</title>
+    <title>Puppy English Adventure</title>
     <style>
         /* Reset and Base Styles */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Arial Rounded MT Bold', 'Arial', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
         }
         
         body {
@@ -18,7 +18,7 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            background-color: #f5f5f5;
+            background-color: #FEF8F1;
             padding: 20px;
         }
         
@@ -30,8 +30,7 @@
             position: relative;
             overflow: hidden;
             border-radius: 16px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
-            background-color: #f0f8ff;
+            background-color: #FEF8F1;
         }
         
         /* Scenes */
@@ -43,6 +42,7 @@
             height: 100%;
             display: none;
             flex-direction: column;
+            background-color: #FEF8F1;
         }
         
         .scene.active {
@@ -51,7 +51,6 @@
         
         /* Start Scene */
         #start-scene {
-            background-color: #FFF6E9;
             justify-content: center;
             align-items: center;
             text-align: center;
@@ -59,157 +58,76 @@
         }
         
         #start-scene h1 {
-            font-size: 24px;
-            margin-bottom: 24px;
-            color: #333;
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 16px;
+            color: #344054;
+        }
+        
+        #start-scene p {
+            font-size: 20px;
+            margin-bottom: 40px;
+            color: #667085;
         }
         
         #start-scene .pet-image {
-            font-size: 72px;
-            margin-bottom: 24px;
+            font-size: 120px;
+            margin: 20px 0 40px;
         }
         
         #start-button {
-            background-color: #5DADE2;
+            background-color: #344054;
             color: white;
             border: none;
             border-radius: 50px;
-            padding: 12px 24px;
-            font-size: 16px;
+            padding: 16px 60px;
+            font-size: 20px;
             font-weight: bold;
             cursor: pointer;
             transition: background-color 0.2s;
         }
         
         #start-button:hover {
-            background-color: #3498DB;
+            background-color: #253141;
         }
         
         /* Learn Scene */
-        #learn-scene {
-            background-color: #E8F8F5;
-        }
-        
         .scene-header {
-            padding: 15px 15px 5px;
+            padding: 20px 15px;
             text-align: center;
-            z-index: 10;
-        }
-        
-        .skip-button {
-            position: absolute;
-            bottom: 60px;
-            right: 15px;
-            background-color: #3498DB;
-            color: white;
-            border: none;
-            border-radius: 20px;
-            padding: 6px 15px;
-            font-size: 14px;
+            font-size: 24px;
             font-weight: bold;
-            cursor: pointer;
-            z-index: 10;
-            transition: background-color 0.2s;
+            color: #000;
         }
         
-        .skip-button:hover {
-            background-color: #2980B9;
-        }
-        
-        .scene-header h1 {
-            font-size: 20px;
-            color: #2C3E50;
-        }
-        
-        .status-bars {
-            position: absolute;
-            top: 50px;
-            right: 15px;
-            width: 100px;
-            z-index: 10;
-        }
-        
-        .status-label {
-            font-size: 12px;
-            font-weight: bold;
-            color: #2C3E50;
-            margin-bottom: 2px;
-        }
-        
-        .status-bar {
-            width: 100%;
-            height: 8px;
-            background-color: #ECF0F1;
-            border-radius: 4px;
-            margin-bottom: 8px;
-            overflow: hidden;
-        }
-        
-        .status-value {
-            height: 100%;
-            border-radius: 4px;
-            transition: width 0.3s;
-        }
-        
-        #energy-value {
-            background-color: #2ECC71;
-        }
-        
-        #happiness-value {
-            background-color: #F1C40F;
-        }
-        
-        .kitchen-bg {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-        }
-        
-        .kitchen-cabinets {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 60px;
-            background-color: #FAF2E5;
-            border-bottom: 3px solid #E5D5BC;
-        }
-        
-        .kitchen-counter {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 80px;
-            background-color: #E5D5BC;
-        }
-        
-        .food-items {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            z-index: 5;
+        .food-container {
+            margin: 20px auto;
+            width: 80%;
+            background-color: #B2B2B2;
+            border-radius: 24px;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            gap: 20px;
+            justify-items: center;
         }
         
         .food-item {
-            position: absolute;
-            width: 60px;
-            height: 60px;
-            border-radius: 12px;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background-color: white;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 30px;
             cursor: pointer;
-            transition: transform 0.2s;
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
         }
         
         .food-item:hover {
-            transform: scale(1.1);
+            transform: scale(1.05);
         }
         
         .food-item.target-item {
@@ -222,274 +140,201 @@
             100% { box-shadow: 0 0 0 0 rgba(253, 203, 110, 0); }
         }
         
-        #bread-item {
-            top: 80px;
-            left: 40px;
-            background-color: #FDEBD0;
+        .food-item img {
+            width: 80%;
+            height: 80%;
+            object-fit: contain;
         }
         
-        #tomato-item {
-            top: 80px;
-            left: 120px;
-            background-color: #FADBD8;
+        .food-emoji {
+            font-size: 40px;
         }
         
-        #chicken-item {
-            top: 80px;
-            left: 200px;
-            background-color: #FCF3CF;
-        }
-        
-        #lettuce-item {
-            top: 160px;
-            left: 40px;
-            background-color: #D5F5E3;
-        }
-        
-        #cucumber-item {
-            top: 160px;
-            left: 120px;
-            background-color: #ABEBC6;
-        }
-        
-        .pet-character {
-            position: absolute;
-            right: 20px;
-            bottom: 90px;
-            font-size: 48px;
-            z-index: 5;
-        }
-        
-        .sandwich-area {
-            position: absolute;
-            right: 80px;
-            bottom: 120px;
+        .message-container {
+            position: relative;
+            margin: 20px auto;
+            width: 90%;
+            background-color: #E6D7C2;
+            border-radius: 50px;
+            padding: 16px 16px 16px 70px;
             display: flex;
-            flex-direction: column-reverse;
             align-items: center;
-            z-index: 4;
-        }
-        
-        .sandwich-item {
-            font-size: 24px;
-            margin-top: -5px;
-        }
-        
-        .message-box {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background-color: #34495E;
-            color: white;
-            padding: 10px 10px 10px 40px;
-            z-index: 10;
-            min-height: 50px;
+            min-height: 70px;
         }
         
         .speaker-icon {
             position: absolute;
-            top: -20px;
             left: 10px;
-            width: 36px;
-            height: 36px;
+            width: 50px;
+            height: 50px;
             background-color: white;
             border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 20px;
-            border: 2px solid #BDC3C7;
+            font-size: 30px;
+            border: 2px solid #E6D7C2;
         }
         
-        .progress-bar {
-            position: absolute;
-            bottom: 60px;
-            left: 15px;
-            right: 15px;
-            z-index: 10;
+        .message-text {
+            font-size: 18px;
+            font-weight: bold;
+            color: #000;
+        }
+        
+        .progress-container {
+            margin: auto 20px 20px;
+            display: flex;
+            flex-direction: column;
         }
         
         .progress-text {
-            font-size: 11px;
-            color: #2C3E50;
-            margin-bottom: 4px;
+            font-size: 16px;
+            color: #344054;
+            margin-bottom: 8px;
         }
         
-        .progress-track {
+        .progress-bar {
             width: 100%;
-            height: 6px;
-            background-color: #ECF0F1;
-            border-radius: 3px;
+            height: 12px;
+            background-color: #E5E5E5;
+            border-radius: 6px;
             overflow: hidden;
         }
         
         .progress-value {
             height: 100%;
-            background-color: #3498DB;
-            border-radius: 3px;
+            background-color: #EABA38;
+            border-radius: 6px;
             transition: width 0.3s;
         }
         
-        /* Check Scene */
-        #check-scene {
-            background-color: #EBF5FB;
+        .skip-button {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background-color: #EABA38;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background-color 0.2s;
         }
         
+        .skip-button:hover {
+            background-color: #D9A429;
+        }
+        
+        /* Check Scene */
         .test-area {
-            position: absolute;
-            top: 0;
-            left: 0;
+            height: 140px;
             width: 100%;
-            height: 65%;
-            background-color: #D6EAF8;
-            z-index: 1;
+            background-color: #615241;
+            position: relative;
         }
         
         .test-floor {
-            position: absolute;
-            bottom: 0;
-            left: 0;
+            height: 120px;
             width: 100%;
-            height: 35%;
-            background-color: #AED6F1;
-            z-index: 1;
+            background-color: #A19D97;
+            position: relative;
         }
         
         .wall-hole {
             position: absolute;
-            top: 80px;
+            top: 40px;
             right: 40px;
             width: 60px;
-            height: 80px;
-            background-color: #212F3D;
+            height: 100px;
+            background-color: #000;
             border-top-left-radius: 30px;
             border-top-right-radius: 30px;
-            z-index: 2;
+        }
+        
+        .mouse-container {
+            position: absolute;
+            left: 40px;
+            top: 40px;
+            display: flex;
+            align-items: center;
         }
         
         .mouse-character {
-            position: absolute;
-            right: 50px;
-            top: 100px;
-            font-size: 24px;
+            font-size: 36px;
             z-index: 4;
-            transition: transform 0.5s;
-            animation: mouseMovement 3s infinite alternate;
-        }
-        
-        @keyframes mouseMovement {
-            0% { transform: translateY(-10px); }
-            25% { transform: translateX(-10px) translateY(-5px); }
-            50% { transform: translateY(10px); }
-            75% { transform: translateX(10px) translateY(5px); }
-            100% { transform: translateY(-10px); }
         }
         
         .stolen-item {
-            position: absolute;
-            top: -30px;
-            right: -8px;
-            font-size: 28px;
-            z-index: 3;
+            font-size: 36px;
+            margin-left: -10px;
         }
         
-        .mouse-character.correct-answer {
-            animation: none;
-            transform: translateX(200px);
+        .mouse-container.timer-running {
+            animation: mouseRunning 5s linear forwards;
         }
         
-        .mouse-character.wrong-answer {
-            animation: none;
-            transform: translateY(200px);
-        }
-        
-        .mouse-character.timer-running {
-            animation: timerMovement 5s linear forwards;
-        }
-        
-        @keyframes timerMovement {
-            0% { right: 50px; top: 100px; }
-            20% { right: 70px; top: 80px; }
-            40% { right: 40px; top: 110px; }
-            60% { right: 60px; top: 90px; }
-            80% { right: 30px; top: 100px; }
-            100% { right: -50px; top: 100px; }
+        @keyframes mouseRunning {
+            0% { left: 40px; }
+            100% { left: calc(100% - 80px); }
         }
         
         .falling-food {
-            position: absolute;
             animation: foodFalling 1s forwards;
-            z-index: 3;
         }
         
         @keyframes foodFalling {
-            0% { top: -30px; right: -8px; }
-            100% { top: 100px; right: -8px; }
-        }
-        
-        .question-box {
-            position: absolute;
-            top: 30%;
-            left: 20px;
-            background-color: white;
-            padding: 10px 15px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            z-index: 5;
-        }
-        
-        .question-text {
-            font-weight: bold;
-            font-size: 14px;
+            0% { transform: translateY(0); }
+            100% { transform: translateY(50px); }
         }
         
         .answer-options {
-            position: absolute;
-            bottom: 75px;
-            left: 15px;
-            right: 15px;
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 20px;
             gap: 10px;
-            z-index: 5;
         }
         
         .answer-option {
-            background-color: white;
-            border: 1px solid #BDC3C7;
-            border-radius: 8px;
-            padding: 10px 5px;
+            flex: 1;
+            background-color: #E5E5E5;
+            border: none;
+            border-radius: 12px;
+            padding: 15px;
             text-align: center;
-            font-size: 14px;
+            font-size: 18px;
             font-weight: bold;
             cursor: pointer;
             transition: background-color 0.2s;
         }
         
         .answer-option:hover {
-            background-color: #F8F9F9;
+            background-color: #D5D5D5;
         }
         
         .answer-option.correct {
-            background-color: #2ECC71;
+            background-color: #4CAF50;
             color: white;
         }
         
         .answer-option.incorrect {
-            background-color: #E74C3C;
+            background-color: #F44336;
             color: white;
         }
         
         .answer-option.disabled {
-            background-color: #ECF0F1;
-            cursor: default;
             opacity: 0.7;
+            cursor: default;
         }
         
         /* Complete Scene */
         #complete-scene {
-            background-color: #FEF9E7;
             justify-content: center;
             align-items: center;
             text-align: center;
@@ -497,9 +342,9 @@
         }
         
         #complete-scene h2 {
-            font-size: 22px;
+            font-size: 28px;
             margin-bottom: 24px;
-            color: #333;
+            color: #344054;
         }
         
         .result-emoji {
@@ -508,21 +353,17 @@
         }
         
         .pet-with-food {
-            margin-top: 10px;
-        }
-        
-        .sandwich-emoji {
-            font-size: 32px;
-            margin-top: 10px;
+            font-size: 100px;
+            margin: 20px 0;
         }
         
         #next-day-button {
-            background-color: #5DADE2;
+            background-color: #344054;
             color: white;
             border: none;
             border-radius: 50px;
-            padding: 12px 24px;
-            font-size: 16px;
+            padding: 16px 60px;
+            font-size: 20px;
             font-weight: bold;
             cursor: pointer;
             margin-top: 30px;
@@ -530,18 +371,18 @@
         }
         
         #next-day-button:hover {
-            background-color: #3498DB;
+            background-color: #253141;
         }
         
         /* Feedback Popup */
         .popup {
             position: absolute;
-            top: 25%;
+            top: 40%;
             left: 50%;
             transform: translateX(-50%);
             background-color: white;
             border-radius: 12px;
-            padding: 15px;
+            padding: 20px;
             display: flex;
             align-items: center;
             box-shadow: 0 6px 16px rgba(0,0,0,0.15);
@@ -557,53 +398,13 @@
         }
         
         .popup-emoji {
-            font-size: 36px;
-            margin-right: 12px;
+            font-size: 40px;
+            margin-right: 16px;
         }
         
         .popup-text {
+            font-size: 18px;
             font-weight: bold;
-        }
-        
-        .popup-audio {
-            margin-left: 10px;
-            font-size: 20px;
-        }
-        
-        /* Bot UI Elements */
-        .bot-ui {
-            position: absolute;
-            bottom: 10px;
-            left: 15px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            z-index: 5;
-        }
-        
-        .ui-button {
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 12px;
-            color: white;
-        }
-        
-        .settings-button {
-            background-color: #2ECC71;
-        }
-        
-        .achievement-button {
-            background-color: #F1C40F;
-        }
-        
-        .level-indicator {
-            font-size: 11px;
-            font-weight: bold;
-            color: #2C3E50;
         }
     </style>
 </head>
@@ -611,119 +412,79 @@
     <div id="game-container">
         <!-- Start Scene -->
         <div id="start-scene" class="scene active">
-            <h1>Guagua's English Adventure</h1>
+            <h1>Puppy English Adventure</h1>
+            <p>Help your puppy learn English words</p>
             <div class="pet-image">🐕</div>
-            <p>Help your puppy learn English words!</p>
-            <button id="start-button">Start Game</button>
+            <button id="start-button">Start</button>
         </div>
         
         <!-- Learn Scene -->
         <div id="learn-scene" class="scene">
-            <div class="scene-header">
-                <h1>Guagua's English Adventure</h1>
-            </div>
+            <div class="scene-header">Learning Phase</div>
             
-            <div class="status-bars">
-                <div class="status-label">Energy</div>
-                <div class="status-bar">
-                    <div id="energy-value" class="status-value" style="width: 50%;"></div>
+            <div class="food-container">
+                <div id="bread-item" class="food-item">
+                    <span class="food-emoji">🍞</span>
                 </div>
-                <div class="status-label">Happiness</div>
-                <div class="status-bar">
-                    <div id="happiness-value" class="status-value" style="width: 60%;"></div>
+                <div id="tomato-item" class="food-item">
+                    <span class="food-emoji">🍅</span>
                 </div>
-            </div>
-            
-            <div class="kitchen-bg">
-                <div class="kitchen-cabinets"></div>
-                <div class="kitchen-counter"></div>
-            </div>
-            
-            <div class="food-items">
-                <div id="bread-item" class="food-item">🍞</div>
-                <div id="tomato-item" class="food-item">🍅</div>
-                <div id="chicken-item" class="food-item">🍗</div>
-                <div id="lettuce-item" class="food-item">🥬</div>
-                <div id="cucumber-item" class="food-item">🥒</div>
-            </div>
-            
-            <div class="pet-character">🐕</div>
-            
-            <div class="sandwich-area" id="sandwich-area"></div>
-            
-            <div class="progress-bar">
-                <div class="progress-text">Progress: <span id="step-progress">0/6</span></div>
-                <div class="progress-track">
-                    <div id="learn-progress-value" class="progress-value" style="width: 0%;"></div>
+                <div id="chicken-item" class="food-item">
+                    <span class="food-emoji">🍗</span>
+                </div>
+                <div id="lettuce-item" class="food-item">
+                    <span class="food-emoji">🥬</span>
+                </div>
+                <div id="cucumber-item" class="food-item">
+                    <span class="food-emoji">🥒</span>
                 </div>
             </div>
             
-            <button id="skip-button" class="skip-button">Skip to Test</button>
-            
-            <div class="message-box">
+            <div class="message-container">
                 <div class="speaker-icon">👨‍🍳</div>
-                <div id="learn-message">Let's make a sandwich for Guagua!</div>
+                <div id="learn-message" class="message-text">First, let's find bread</div>
             </div>
             
-            <div class="bot-ui">
-                <div class="ui-button settings-button">⚙️</div>
-                <div class="ui-button achievement-button">🏆</div>
-                <div class="level-indicator">Lv.1</div>
+            <div class="progress-container">
+                <div class="progress-text">progress: <span id="step-progress">1/6</span></div>
+                <div class="progress-bar">
+                    <div id="learn-progress-value" class="progress-value" style="width: 16.6%;"></div>
+                </div>
             </div>
+            
+            <button id="skip-button" class="skip-button">skip</button>
         </div>
         
         <!-- Check Scene -->
         <div id="check-scene" class="scene">
-            <div class="scene-header">
-                <h1>Guagua's English Adventure</h1>
-            </div>
+            <div class="scene-header">Test Phase</div>
             
-            <div class="status-bars">
-                <div class="status-label">Energy</div>
-                <div class="status-bar">
-                    <div id="check-energy-value" class="status-value" style="width: 50%;"></div>
-                </div>
-                <div class="status-label">Happiness</div>
-                <div class="status-bar">
-                    <div id="check-happiness-value" class="status-value" style="width: 60%;"></div>
+            <div class="test-area">
+                <div class="wall-hole"></div>
+                <div id="mouse-container" class="mouse-container">
+                    <div class="mouse-character">🐁</div>
+                    <div id="stolen-item" class="stolen-item">🍞</div>
                 </div>
             </div>
             
-            <div class="test-area"></div>
             <div class="test-floor"></div>
-            <div class="wall-hole"></div>
             
-            <div class="mouse-character" id="mouse-character">
-                🐭
-                <div class="stolen-item" id="stolen-item">🍞</div>
-            </div>
-            
-            <div class="question-box">
-                <div class="question-text" id="question-text">What's this?</div>
+            <div class="message-container">
+                <div class="speaker-icon">🐕</div>
+                <div id="check-message" class="message-text">The mouse is stealing! What's this!</div>
             </div>
             
             <div class="answer-options" id="answer-options">
-                <!-- Options will be added dynamically -->
+                <button class="answer-option">Apple</button>
+                <button class="answer-option">Bread</button>
+                <button class="answer-option">Orange</button>
             </div>
             
-            <div class="pet-character">🐕</div>
-            
-            <div class="progress-bar">
-                <div class="progress-text">Question: <span id="question-progress">1/3</span></div>
-                <div class="progress-track">
-                    <div id="check-progress-value" class="progress-value" style="width: 33%;"></div>
+            <div class="progress-container">
+                <div class="progress-text">Questions: <span id="question-progress">1/3</span></div>
+                <div class="progress-bar">
+                    <div id="check-progress-value" class="progress-value" style="width: 33.3%;"></div>
                 </div>
-            </div>
-            
-            <div class="message-box">
-                <div class="speaker-icon">🐕</div>
-                <div id="check-message">The mouse is stealing! Answer the question to catch them.</div>
-            </div>
-            
-            <div class="bot-ui">
-                <div class="ui-button settings-button">⚙️</div>
-                <div class="ui-button achievement-button">🏆</div>
-                <div class="level-indicator">Lv.1</div>
             </div>
         </div>
         
@@ -731,11 +492,8 @@
         <div id="complete-scene" class="scene">
             <h2>Great job!</h2>
             <div class="result-emoji">🎉</div>
-            <p id="completion-message">Look, now Guagua is full of energy!</p>
-            <div class="pet-with-food">
-                <div class="pet-image">🐕</div>
-                <div class="sandwich-emoji">🥪</div>
-            </div>
+            <p id="completion-message">Look, now your puppy is full of energy!</p>
+            <div class="pet-with-food">🐕</div>
             <button id="next-day-button">Play Next Day</button>
         </div>
         
@@ -743,7 +501,6 @@
         <div class="popup" id="feedback-popup">
             <div class="popup-emoji" id="popup-emoji">🍞</div>
             <div class="popup-text" id="popup-text">Bread</div>
-            <div class="popup-audio">🔊</div>
         </div>
     </div>
 
@@ -751,8 +508,6 @@
         // Game state
         const gameState = {
             phase: 'start',
-            energy: 50,
-            happiness: 60,
             learnStep: 0,
             currentQuestion: 0,
             score: 0,
@@ -771,10 +526,6 @@
         // Learning steps
         const learningSteps = [
             { 
-                instruction: "Let's make a sandwich for Guagua!",
-                targetItem: null
-            },
-            { 
                 instruction: "First, let's find bread",
                 targetItem: 'bread'
             },
@@ -787,15 +538,15 @@
                 targetItem: 'chicken'
             },
             { 
-                instruction: "Let's add a tomato",
+                instruction: "Let's find a tomato",
                 targetItem: 'tomato'
             },
             { 
-                instruction: "Finally, let's add some lettuce",
+                instruction: "Finally, let's find lettuce",
                 targetItem: 'lettuce'
             },
             { 
-                instruction: "Excellent! We made a sandwich for Guagua!",
+                instruction: "Great job! You found all the ingredients!",
                 targetItem: null
             }
         ];
@@ -828,11 +579,6 @@
         const checkScene = document.getElementById('check-scene');
         const completeScene = document.getElementById('complete-scene');
         
-        const energyValue = document.getElementById('energy-value');
-        const happinessValue = document.getElementById('happiness-value');
-        const checkEnergyValue = document.getElementById('check-energy-value');
-        const checkHappinessValue = document.getElementById('check-happiness-value');
-        
         const learnMessage = document.getElementById('learn-message');
         const checkMessage = document.getElementById('check-message');
         const completionMessage = document.getElementById('completion-message');
@@ -842,10 +588,9 @@
         const questionProgress = document.getElementById('question-progress');
         const checkProgressValue = document.getElementById('check-progress-value');
         
-        const sandwichArea = document.getElementById('sandwich-area');
-        const mouseCharacter = document.getElementById('mouse-character');
+        const mouseContainer = document.getElementById('mouse-container');
         const stolenItem = document.getElementById('stolen-item');
-        const questionText = document.getElementById('question-text');
+        
         const answerOptions = document.getElementById('answer-options');
         
         const feedbackPopup = document.getElementById('feedback-popup');
@@ -867,11 +612,6 @@
         function startGame() {
             changeScene('learn');
             updateLearnStep(0);
-            
-            // Start the first step after a short delay
-            setTimeout(() => {
-                updateLearnStep(1);
-            }, 2000);
         }
         
         function changeScene(newScene) {
@@ -894,16 +634,6 @@
             } else if (newScene === 'complete') {
                 completeScene.classList.add('active');
             }
-            
-            // Update status bars
-            updateStatusBars();
-        }
-        
-        function updateStatusBars() {
-            energyValue.style.width = `${gameState.energy}%`;
-            happinessValue.style.width = `${gameState.happiness}%`;
-            checkEnergyValue.style.width = `${gameState.energy}%`;
-            checkHappinessValue.style.width = `${gameState.happiness}%`;
         }
         
         function updateLearnStep(step) {
@@ -917,8 +647,8 @@
             learnMessage.textContent = learningSteps[step].instruction;
             
             // Update progress
-            const totalSteps = learningSteps.length - 1; // Subtract first instruction
-            const currentProgress = Math.min(step, totalSteps);
+            const totalSteps = learningSteps.length;
+            const currentProgress = step + 1;
             stepProgress.textContent = `${currentProgress}/${totalSteps}`;
             learnProgressValue.style.width = `${(currentProgress / totalSteps) * 100}%`;
             
@@ -949,28 +679,14 @@
                 // Correct item selected
                 showPopup(item, true);
                 
-               // Add to sandwich
-                addToSandwich(item);
-                
-                // Increase happiness
-                gameState.happiness = Math.min(gameState.happiness + 8, 100);
-                updateStatusBars();
-                
                 // Move to next step after a delay
                 setTimeout(() => {
                     updateLearnStep(gameState.learnStep + 1);
                 }, 1500);
             } else {
                 // Wrong item selected
-                showPopup({ emoji: '❌', name: "That's not what we're looking for. Try again!" }, false);
+                showPopup({ emoji: '❌', name: "Try again!" }, false);
             }
-        }
-        
-        function addToSandwich(item) {
-            const sandwichItem = document.createElement('div');
-            sandwichItem.className = 'sandwich-item';
-            sandwichItem.textContent = item.emoji;
-            sandwichArea.appendChild(sandwichItem);
         }
         
         function showPopup(item, isSuccess) {
@@ -978,7 +694,7 @@
             popupText.textContent = item.name;
             
             // Add border color based on success/failure
-            feedbackPopup.style.borderLeft = isSuccess ? '4px solid #2ECC71' : '4px solid #E74C3C';
+            feedbackPopup.style.borderLeft = isSuccess ? '4px solid #4CAF50' : '4px solid #F44336';
             
             // Show popup
             feedbackPopup.classList.add('visible');
@@ -986,7 +702,7 @@
             // Hide after a delay
             setTimeout(() => {
                 feedbackPopup.classList.remove('visible');
-            }, 2000);
+            }, 1500);
         }
         
         function skipToTestPhase() {
@@ -1018,24 +734,21 @@
             stolenItem.className = 'stolen-item';
             
             // Reset mouse position and animation
-            mouseCharacter.className = 'mouse-character';
-            
-            // Update question text
-            questionText.textContent = question.question;
+            mouseContainer.className = 'mouse-container';
             
             // Update progress
             questionProgress.textContent = `${questionIndex + 1}/${questions.length}`;
             checkProgressValue.style.width = `${((questionIndex + 1) / questions.length) * 100}%`;
             
             // Set check message
-            checkMessage.textContent = `The mouse is stealing ${foodItems.find(item => item.id === question.item).name}! What's this?`;
+            checkMessage.textContent = `The mouse is stealing! What's this!`;
             
             // Clear answer options
             answerOptions.innerHTML = '';
             
             // Add answer options
             question.options.forEach(option => {
-                const optionElement = document.createElement('div');
+                const optionElement = document.createElement('button');
                 optionElement.className = 'answer-option';
                 optionElement.textContent = option;
                 optionElement.addEventListener('click', () => handleAnswerSelect(option));
@@ -1043,7 +756,7 @@
             });
             
             // Start mouse timer animation
-            mouseCharacter.classList.add('timer-running');
+            mouseContainer.classList.add('timer-running');
             
             // Set timer to auto-fail if no answer is selected
             clearTimeout(mouseTimer);
@@ -1069,10 +782,6 @@
             
             // Update message
             checkMessage.textContent = "Time's up! The mouse got away with the food!";
-            
-            // Reduce happiness
-            gameState.happiness = Math.max(gameState.happiness - 5, 0);
-            updateStatusBars();
             
             // Move to next question after delay
             setTimeout(() => {
@@ -1102,38 +811,32 @@
             });
             
             // Remove timer animation
-            mouseCharacter.classList.remove('timer-running');
+            mouseContainer.classList.remove('timer-running');
             
             if (isCorrect) {
                 // Correct answer
                 gameState.score++;
-                gameState.energy = Math.min(gameState.energy + 10, 100);
-                gameState.happiness = Math.min(gameState.happiness + 10, 100);
                 
                 // Update message
                 checkMessage.textContent = "Correct! The mouse dropped the food!";
                 
                 // Make food fall down
-                stolenItem.className = 'stolen-item falling-food';
+                stolenItem.classList.add('falling-food');
                 
-                // Animate mouse escaping
+                // Mouse runs away without food
                 setTimeout(() => {
-                    mouseCharacter.classList.add('correct-answer');
+                    stolenItem.style.opacity = '0';
+                    mouseContainer.style.left = 'calc(100% - 80px)';
                 }, 300);
             } else {
                 // Wrong answer
-                gameState.energy = Math.max(gameState.energy - 5, 0);
-                gameState.happiness = Math.max(gameState.happiness - 5, 0);
                 
                 // Update message
                 checkMessage.textContent = `Wrong! That's a ${foodItems.find(item => item.id === question.item).name}.`;
                 
-                // Animate mouse escaping with food
-                mouseCharacter.classList.add('wrong-answer');
+                // Mouse runs away with food
+                mouseContainer.style.left = 'calc(100% - 80px)';
             }
-            
-            // Update status bars
-            updateStatusBars();
             
             // Move to next question after delay
             setTimeout(() => {
@@ -1152,7 +855,7 @@
             
             // Move to complete phase after delay
             setTimeout(() => {
-                completionMessage.textContent = `Look, now Guagua is full of energy!`;
+                completionMessage.textContent = `Look, now your puppy is full of energy!`;
                 changeScene('complete');
                 
                 // Show "See you tomorrow" message after a delay
@@ -1170,17 +873,9 @@
             gameState.score = 0;
             gameState.dayComplete = false;
             
-            // Reset sandwich
-            sandwichArea.innerHTML = '';
-            
             // Start with learning phase
             changeScene('learn');
             updateLearnStep(0);
-            
-            // Start the first step after a short delay
-            setTimeout(() => {
-                updateLearnStep(1);
-            }, 1500);
         }
     </script>
 </body>
