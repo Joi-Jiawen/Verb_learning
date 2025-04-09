@@ -62,17 +62,20 @@
             font-weight: bold;
             margin-bottom: 16px;
             color: #344054;
+            animation: fadeInDown 1s ease-out;
         }
         
         #start-scene p {
             font-size: 20px;
             margin-bottom: 40px;
             color: #667085;
+            animation: fadeInUp 1s ease-out 0.3s both;
         }
         
         #start-scene .pet-image {
             font-size: 120px;
             margin: 20px 0 40px;
+            animation: bounce 2s infinite;
         }
         
         #start-button {
@@ -84,11 +87,109 @@
             font-size: 20px;
             font-weight: bold;
             cursor: pointer;
-            transition: background-color 0.2s;
+            transition: all 0.3s;
+            animation: startButtonAnimation 3s infinite, fadeIn 1s ease-out 0.6s both;
+            position: relative;
+            overflow: hidden;
         }
         
         #start-button:hover {
             background-color: #253141;
+            transform: scale(1.05);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+        }
+
+        #start-button::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: rotate(30deg);
+            animation: shineEffect 3s infinite;
+        }
+
+        @keyframes startButtonAnimation {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(52, 64, 84, 0.7);
+            }
+            70% {
+                transform: scale(1.05);
+                box-shadow: 0 0 0 10px rgba(52, 64, 84, 0);
+            }
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(52, 64, 84, 0);
+            }
+        }
+        
+        @keyframes shineEffect {
+            0% {
+                left: -100%;
+                top: -100%;
+            }
+            20%, 100% {
+                left: 100%;
+                top: 100%;
+            }
+        }
+        
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-20px);
+            }
+            60% {
+                transform: translateY(-10px);
+            }
+        }
+        
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(52, 64, 84, 0.5);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(52, 64, 84, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(52, 64, 84, 0);
+            }
         }
         
         /* Learn Scene */
@@ -140,12 +241,6 @@
             100% { box-shadow: 0 0 0 0 rgba(253, 203, 110, 0); }
         }
         
-        .food-item img {
-            width: 80%;
-            height: 80%;
-            object-fit: contain;
-        }
-        
         .food-emoji {
             font-size: 40px;
         }
@@ -186,7 +281,10 @@
             margin: auto 20px 20px;
             display: flex;
             flex-direction: column;
+            position: relative;      /* Added to create a positioning context */
+            padding-right: 70px;     /* Added to reserve space for the icon */
         }
+        
         
         .progress-text {
             font-size: 16px;
@@ -211,15 +309,15 @@
         
         .skip-button {
             position: absolute;
-            bottom: 20px;
+            bottom: 10px;
             right: 20px;
             background-color: #EABA38;
             color: white;
             border: none;
             border-radius: 50%;
-            width: 60px;
-            height: 60px;
-            font-size: 16px;
+            width: 50px;
+            height: 50px;
+            font-size: 14px;
             font-weight: bold;
             cursor: pointer;
             display: flex;
@@ -227,6 +325,7 @@
             align-items: center;
             transition: background-color 0.2s;
         }
+        
         
         .skip-button:hover {
             background-color: #D9A429;
@@ -269,11 +368,12 @@
         .mouse-character {
             font-size: 36px;
             z-index: 4;
+            transform: scaleX(-1);
         }
         
         .stolen-item {
             font-size: 36px;
-            margin-left: -10px;
+            margin-left: -5px;
         }
         
         .mouse-container.timer-running {
@@ -286,12 +386,15 @@
         }
         
         .falling-food {
-            animation: foodFalling 1s forwards;
+            position: absolute;
+            font-size: 36px;
+            left: 40px;
+            animation: foodFalling 1s ease-in forwards;
         }
         
         @keyframes foodFalling {
-            0% { transform: translateY(0); }
-            100% { transform: translateY(50px); }
+            0% { top: 40px; }
+            100% { top: 90px; opacity: 0.5; }
         }
         
         .answer-options {
@@ -716,6 +819,12 @@
             gameState.currentQuestion = 0;
             gameState.score = 0;
             
+            // Reset any existing fallen food
+            const fallenFood = document.querySelector('.falling-food');
+            if (fallenFood) {
+                fallenFood.remove();
+            }
+            
             // Set up first question
             setupQuestion(0);
         }
@@ -729,12 +838,20 @@
             
             const question = questions[questionIndex];
             
-            // Update stolen item
+            // Reset mouse container position and animation
+            mouseContainer.className = 'mouse-container';
+            mouseContainer.style.left = '40px'; // Reset position explicitly
+            
+            // Update stolen item - always show the correct food for the current question
+            stolenItem.style.display = 'block'; // Make sure it's visible
             stolenItem.textContent = foodItems.find(item => item.id === question.item).emoji;
             stolenItem.className = 'stolen-item';
             
-            // Reset mouse position and animation
-            mouseContainer.className = 'mouse-container';
+            // Remove any fallen food from previous questions
+            const fallenFood = document.querySelector('.falling-food');
+            if (fallenFood) {
+                fallenFood.remove();
+            }
             
             // Update progress
             questionProgress.textContent = `${questionIndex + 1}/${questions.length}`;
@@ -820,12 +937,17 @@
                 // Update message
                 checkMessage.textContent = "Correct! The mouse dropped the food!";
                 
-                // Make food fall down
-                stolenItem.classList.add('falling-food');
+                // Hide the stolen item from the mouse
+                stolenItem.style.display = 'none';
+                
+                // Create a falling food element
+                const fallingFoodElem = document.createElement('div');
+                fallingFoodElem.className = 'falling-food';
+                fallingFoodElem.textContent = foodItems.find(item => item.id === question.item).emoji;
+                document.querySelector('.test-area').appendChild(fallingFoodElem);
                 
                 // Mouse runs away without food
                 setTimeout(() => {
-                    stolenItem.style.opacity = '0';
                     mouseContainer.style.left = 'calc(100% - 80px)';
                 }, 300);
             } else {
